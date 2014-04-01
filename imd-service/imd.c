@@ -56,9 +56,10 @@ int main(int argc, char **argv) {
 	FILE *stream;          	/* stream version of childfd */
 	FILE *message;
 	char buf[BUFSIZE];     	/* message buffer */
-  	char to[BUFSIZE];     	/* request uri */
-	char filename[BUFSIZE]; /* request uri */
-	char msgname[BUFSIZE]; /* request uri */
+  	char to[50];     	
+	char filename[255]; 
+	char directory[255]; 
+	char msgname[45]; 
 
 	struct stat st = {0};
 
@@ -127,14 +128,15 @@ int main(int argc, char **argv) {
 				printf("MSG To: %s\n",  to);
 		
 				rand_str(msgname,40);
-				strcpy(filename, "");;
-				strcat(filename, "../messages/");
-				strcat(filename, to);
+				strcpy(directory, "");;
+				strcat(directory, "../messages/");
+				strcat(directory, to);
 
-				if (stat(filename, &st) == -1) {
+				if (stat(directory, &st) == -1) {
 					error("Error unknown user");
 				}			
 
+				strcpy(filename, directory);
 				strcat(filename, "/");
 				strcat(filename, msgname);
 				strcat(filename, ".xml");
