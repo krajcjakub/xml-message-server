@@ -1,4 +1,5 @@
 - Ošetriť neukončené správy.
 - Ošetriť vstup bez hlavicky
-- Forkovanie procesu
+// - Forkovanie procesu
+-triedenie správ do prečinkov podľa dátumov
 

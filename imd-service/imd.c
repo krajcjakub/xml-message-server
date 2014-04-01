@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
 	int parentfd;          /* parent socket */
 	int childfd;           /* child socket */
 	int portno;            /* port to listen on */
+	int childPID;           /* child socket */
 	int clientlen;         /* byte size of client's address */
 	struct hostent *hostp; /* client host info */
 	char *hostaddrp;       /* dotted decimal host addr string */
@@ -95,43 +96,57 @@ int main(int argc, char **argv) {
 		if (childfd < 0) 
 			error("ERROR on accept");
 
-		/* determine who sent the message */
-		hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, 
-			sizeof(clientaddr.sin_addr.s_addr), AF_INET);
+		childPID = fork();
 
-		if (hostp == NULL)
-			error("ERROR on gethostbyaddr");
+		if(childPID >= 0) // fork was successful
+		{
+		    if(childPID == 0) // child process
+		    {
+		        /* determine who sent the message */
+				hostp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, 
+					sizeof(clientaddr.sin_addr.s_addr), AF_INET);
 
-		hostaddrp = inet_ntoa(clientaddr.sin_addr);
+				if (hostp == NULL)
+					error("ERROR on gethostbyaddr");
 
-		if (hostaddrp == NULL)
-			error("ERROR on inet_ntoa\n");
+				hostaddrp = inet_ntoa(clientaddr.sin_addr);
 
-		/* open the child socket descriptor as a stream */
-		if ((stream = fdopen(childfd, "r+")) == NULL)
-			error("ERROR on fdopen");
+				if (hostaddrp == NULL)
+					error("ERROR on inet_ntoa\n");
+
+				/* open the child socket descriptor as a stream */
+				if ((stream = fdopen(childfd, "r+")) == NULL)
+					error("ERROR on fdopen");
 		
-		fgets(buf, BUFSIZE, stream);
-		sscanf(buf, "TO:%s\n", to);
-		printf("MSG To: %s\n",  to);
+				fgets(buf, BUFSIZE, stream);
+				sscanf(buf, "TO:%s\n", to);
+				printf("MSG To: %s\n",  to);
 		
-		rand_str(msgname,40);
-		strcpy(filename, "");;
-		strcat(filename, "../messages/");
-		strcat(filename, to);
-		strcat(filename, "/");
-		strcat(filename, msgname);
-		strcat(filename, ".xml");
-		printf("MSG File: %s\n",  filename);
-		message = fopen(filename,"w");
+				rand_str(msgname,40);
+				strcpy(filename, "");;
+				strcat(filename, "../messages/");
+				strcat(filename, to);
+				strcat(filename, "/");
+				strcat(filename, msgname);
+				strcat(filename, ".xml");
+				printf("MSG File: %s\n",  filename);
+				message = fopen(filename,"w");
 		
-		fgets(buf, BUFSIZE, stream);
-		while(strcmp(buf, "MESSAGE_END\n")) {			
-      		fputs(buf, message);
-			printf("BUF: %s",  buf);
-			fgets(buf, BUFSIZE, stream);
-    	}
-		printf("MSGEND");
-		fclose(message);
+				fgets(buf, BUFSIZE, stream);
+				while(strcmp(buf, "MESSAGE_END\n")) {			
+			  		fputs(buf, message);
+					printf("BUF: %s",  buf);
+					fgets(buf, BUFSIZE, stream);
+				}
+				printf("MSGEND");
+				fclose(message);
+				return 0;
+			}
+		}
+		else // fork failed
+		{
+		    printf("\n Fork failed, quitting!!!!!!\n");
+		    return 1;
+		}
 	}
 }
