@@ -11,6 +11,8 @@
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
+#include <sys/stat.h>
 
 #define BUFSIZE 1024
 #define MAXERRS 16
@@ -57,6 +59,8 @@ int main(int argc, char **argv) {
   	char to[BUFSIZE];     	/* request uri */
 	char filename[BUFSIZE]; /* request uri */
 	char msgname[BUFSIZE]; /* request uri */
+
+	struct stat st = {0};
 
 	/* check command line args */
 	portno = 5865;
@@ -126,6 +130,11 @@ int main(int argc, char **argv) {
 				strcpy(filename, "");;
 				strcat(filename, "../messages/");
 				strcat(filename, to);
+
+				if (stat(filename, &st) == -1) {
+					error("Error unknown user");
+				}			
+
 				strcat(filename, "/");
 				strcat(filename, msgname);
 				strcat(filename, ".xml");

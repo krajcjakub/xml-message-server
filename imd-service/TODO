@@ -1,5 +1,6 @@
 - Ošetriť neukončené správy.
 - Ošetriť vstup bez hlavicky
 // - Forkovanie procesu
+// - kontrola ext usera 
 -triedenie správ do prečinkov podľa dátumov
 
