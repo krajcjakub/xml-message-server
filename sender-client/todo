@@ -1,0 +1,5 @@
+- read text file line by line
+- open connection to imd-service
+- create and send msg header
+- send msg line by line
+- file and recipient as cmdline arguments
